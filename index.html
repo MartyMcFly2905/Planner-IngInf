@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Planner Esami 2026 - IFO</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; }
+        
+        /* Sidebar laterale per la selezione */
+        .sidebar { flex: 0 0 300px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content; max-height: 90vh; overflow-y: auto; }
+        .sidebar h2 { margin-top: 0; font-size: 1.2rem; color: #1a237e; }
+        .course-item { display: flex; align-items: center; margin-bottom: 8px; padding: 5px; border-radius: 4px; transition: background 0.2s; cursor: pointer; }
+        .course-item:hover { background: #f5f5f5; }
+        .course-item input { margin-right: 10px; transform: scale(1.2); }
+        .btn-reset { display: block; width: 100%; padding: 10px; background: #ff5252; color: white; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px; font-weight: bold; }
+
+        /* Calendario */
+        .main-content { flex: 1; }
+        .month-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .month-title { text-align: center; color: #333; margin-bottom: 20px; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .day-header { text-align: center; font-weight: bold; color: #777; padding: 10px 0; background: #fafafa; border-radius: 4px; }
+        
+        .day-cell { min-height: 120px; border: 1px solid #eee; border-radius: 8px; padding: 8px; background: #fff; position: relative; }
+        .day-cell.empty { background: transparent; border: none; }
+        .day-number { font-weight: bold; font-size: 1.1rem; color: #444; margin-bottom: 5px; display: block; }
+        
+        /* Stile degli esami dentro i giorni */
+        .exam-tag { font-size: 0.75rem; padding: 6px; margin-bottom: 4px; border-radius: 4px; border-left: 4px solid; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .exam-tag.scritto { background: #e3f2fd; border-color: #1565c0; color: #0d47a1; }
+        .exam-tag.orale { background: #fff3e0; border-color: #ef6c00; color: #e65100; }
+        .exam-tag.pratica { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+        
+        .exam-time { font-weight: bold; display: block; }
+        .exam-room { font-style: italic; display: block; font-size: 0.7rem; color: #555; }
+
+        @media (max-width: 768px) { .container { flex-direction: column; } .sidebar { width: auto; max-height: 300px; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <h2>Seleziona Corsi</h2>
+        <button class="btn-reset" onclick="resetSelection()">Deseleziona Tutti</button>
+        <div id="courseList"></div>
+    </div>
+
+    <div class="main-content">
+        <div id="calendarArea"></div>
+    </div>
+</div>
+
+<script>
+    // DATI ESTRATTI E PULITI DAL CSV
+    const rawData = [
+        {dt:"2026-01-19 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
+        {dt:"2026-02-05 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
+        {dt:"2026-02-26 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
+        {dt:"2026-01-13 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-01-30 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-02-20 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-01-08 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-01-14 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
+        {dt:"2026-01-27 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-02-02 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
+        {dt:"2026-02-17 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-02-23 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
+        {dt:"2026-01-15 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-02-03 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-02-24 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-01-09 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-01-15 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-01-28 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-02-03 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-02-18 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-02-24 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-01-08 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-01-12 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+        {dt:"2026-01-27 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-01-29 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+        {dt:"2026-02-17 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-02-19 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+        {dt:"2026-01-09 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-01-14 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
+        {dt:"2026-01-28 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-02-02 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
+        {dt:"2026-02-18 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-02-23 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
+        {dt:"2026-01-12 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-01-12 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+        {dt:"2026-01-29 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-01-29 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+        {dt:"2026-02-19 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-02-19 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+        {dt:"2026-01-12 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-01-20 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-01-29 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-02-06 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-02-19 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-02-27 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-01-13 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-01-15 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-01-30 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-02-03 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-02-20 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-02-24 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-01-09 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-01-16 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+        {dt:"2026-01-28 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-02-04 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+        {dt:"2026-02-18 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-02-25 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+        {dt:"2026-01-07 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ING A13", tipo:"Orale"},
+        {dt:"2026-02-06 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-02-27 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-01-07 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-01-20 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
+        {dt:"2026-01-26 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-02-06 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
+        {dt:"2026-02-16 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-02-27 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
+        {dt:"2026-01-07 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+        {dt:"2026-01-26 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+        {dt:"2026-02-16 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+        {dt:"2026-01-13 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-01-30 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-02-20 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-01-15 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING SI6", tipo:"Scritto"},
+        {dt:"2026-02-03 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
+        {dt:"2026-02-24 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
+        {dt:"2026-01-09 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-01-12 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI5", tipo:"Orale"},
+        {dt:"2026-01-30 08:30", mat:"PROGETTAZIONE WEB", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-02-02 08:30", mat:"PROGETTAZIONE WEB", aula:"ING S15", tipo:"Orale"},
+        {dt:"2026-02-18 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-02-19 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI5", tipo:"Orale"},
+        {dt:"2026-01-07 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-01-07 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-01-26 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-01-26 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-02-16 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-02-16 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-01-08 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
+        {dt:"2026-01-27 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
+        {dt:"2026-02-17 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
+        {dt:"2026-01-08 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-01-16 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+        {dt:"2026-01-27 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-02-04 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+        {dt:"2026-02-17 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-02-25 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+        {dt:"2026-01-14 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
+        {dt:"2026-01-19 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-02-02 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
+        {dt:"2026-02-05 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-02-23 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
+        {dt:"2026-02-26 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-01-07 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-01-26 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-02-16 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"}
+    ];
+
+    let selectedCourses = new Set();
+
+    // Inizializza: estrai corsi unici, popola sidebar e disegna calendario
+    function init() {
+        const uniqueCourses = [...new Set(rawData.map(item => item.mat))].sort();
+        const listDiv = document.getElementById('courseList');
+        
+        uniqueCourses.forEach(course => {
+            const div = document.createElement('div');
+            div.className = 'course-item';
+            div.innerHTML = `<label style="width:100%; cursor:pointer; display:flex; align-items:center;">
+                                <input type="checkbox" value="${course}" onchange="toggleCourse(this)">
+                                ${course}
+                             </label>`;
+            listDiv.appendChild(div);
+        });
+
+        drawCalendar();
+    }
+
+    function toggleCourse(checkbox) {
+        if (checkbox.checked) {
+            selectedCourses.add(checkbox.value);
+        } else {
+            selectedCourses.delete(checkbox.value);
+        }
+        drawCalendar();
+    }
+
+    function resetSelection() {
+        selectedCourses.clear();
+        document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+        drawCalendar();
+    }
+
+    function drawCalendar() {
+        const container = document.getElementById('calendarArea');
+        container.innerHTML = '';
+
+        // Disegna Gennaio e Febbraio 2026
+        renderMonth(2026, 0, container); // 0 = Gennaio
+        renderMonth(2026, 1, container); // 1 = Febbraio
+    }
+
+    function renderMonth(year, month, container) {
+        const monthNames = ["Gennaio", "Febbraio"];
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Calcola giorno settimana inizio mese (Lun=0...Dom=6 per gestire layout italiano)
+        let firstDay = new Date(year, month, 1).getDay();
+        // Converti: Dom(0) -> 6, Lun(1) -> 0
+        firstDay = (firstDay === 0) ? 6 : firstDay - 1;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'month-container';
+        
+        let html = `<h3 class="month-title">${monthNames[month]} ${year}</h3>`;
+        html += `<div class="calendar-grid">`;
+        
+        // Header Giorni
+        const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+        days.forEach(d => html += `<div class="day-header">${d}</div>`);
+
+        // Celle vuote prima del primo giorno
+        for (let i = 0; i < firstDay; i++) {
+            html += `<div class="day-cell empty"></div>`;
+        }
+
+        // Giorni del mese
+        for (let day = 1; day <= daysInMonth; day++) {
+            // Cerca esami per questo giorno
+            const currentDtStr = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            // Filtra esami: deve coincidere la data E il corso deve essere selezionato
+            const daysExams = rawData.filter(ex => {
+                const exDate = ex.dt.split(' ')[0];
+                return exDate === currentDtStr && selectedCourses.has(ex.mat);
+            });
+
+            html += `<div class="day-cell">
+                        <span class="day-number">${day}</span>`;
+            
+            daysExams.forEach(ex => {
+                const time = ex.dt.split(' ')[1];
+                let typeClass = "";
+                if(ex.tipo.toLowerCase().includes("scritto")) typeClass = "scritto";
+                else if(ex.tipo.toLowerCase().includes("orale")) typeClass = "orale";
+                else if(ex.tipo.toLowerCase().includes("pratica")) typeClass = "pratica";
+
+                html += `<div class="exam-tag ${typeClass}">
+                            <span class="exam-time">${time} - ${ex.mat}</span>
+                            <span class="exam-room">📍 ${ex.aula} (${ex.tipo})</span>
+                         </div>`;
+            });
+
+            html += `</div>`;
+        }
+
+        html += `</div>`; // Chiude grid
+        wrapper.innerHTML = html;
+        container.appendChild(wrapper);
+    }
+
+    // Avvia tutto
+    init();
+</script>
+
+</body>
+</html>
