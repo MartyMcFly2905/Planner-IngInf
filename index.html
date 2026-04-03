@@ -54,113 +54,134 @@
 </div>
 
 <script>
-    // DATI ESTRATTI E PULITI DAL CSV
+    // DATI ESTRATTI E PULITI DAI FILE PDF (Appelli Estivi IFO-L)
     const rawData = [
-        {dt:"2026-01-19 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
-        {dt:"2026-02-05 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
-        {dt:"2026-02-26 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
-        {dt:"2026-01-13 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-01-30 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-02-20 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-01-08 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
-        {dt:"2026-01-14 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
-        {dt:"2026-01-27 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
-        {dt:"2026-02-02 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
-        {dt:"2026-02-17 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
-        {dt:"2026-02-23 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
-        {dt:"2026-01-15 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-02-03 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-02-24 08:30", mat:"BASI DI DATI", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-01-09 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-01-15 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-01-28 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-02-03 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-02-18 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-02-24 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-01-08 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
-        {dt:"2026-01-12 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
-        {dt:"2026-01-27 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
-        {dt:"2026-01-29 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
-        {dt:"2026-02-17 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
-        {dt:"2026-02-19 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
-        {dt:"2026-01-09 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
-        {dt:"2026-01-14 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
-        {dt:"2026-01-28 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
-        {dt:"2026-02-02 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
-        {dt:"2026-02-18 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
-        {dt:"2026-02-23 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
-        {dt:"2026-01-12 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
-        {dt:"2026-01-12 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
-        {dt:"2026-01-29 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
-        {dt:"2026-01-29 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
-        {dt:"2026-02-19 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
-        {dt:"2026-02-19 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
-        {dt:"2026-01-12 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-01-20 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-01-29 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-02-06 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-02-19 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-02-27 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-01-13 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-01-15 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-01-30 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-02-03 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-02-20 08:30", mat:"ELETTROTECNICA", aula:"ETR F6", tipo:"Scritto"},
-        {dt:"2026-02-24 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
-        {dt:"2026-01-09 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
-        {dt:"2026-01-16 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
-        {dt:"2026-01-28 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
-        {dt:"2026-02-04 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
-        {dt:"2026-02-18 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
-        {dt:"2026-02-25 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
-        {dt:"2026-01-07 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ING A13", tipo:"Orale"},
-        {dt:"2026-02-06 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-02-27 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-01-07 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
-        {dt:"2026-01-20 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
-        {dt:"2026-01-26 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
-        {dt:"2026-02-06 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
-        {dt:"2026-02-16 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1", tipo:"Pratica"},
-        {dt:"2026-02-27 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
-        {dt:"2026-01-07 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
-        {dt:"2026-01-26 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
-        {dt:"2026-02-16 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
-        {dt:"2026-01-13 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-01-30 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-02-20 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-01-15 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING SI6", tipo:"Scritto"},
-        {dt:"2026-02-03 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
-        {dt:"2026-02-24 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
-        {dt:"2026-01-09 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
-        {dt:"2026-01-12 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI5", tipo:"Orale"},
-        {dt:"2026-01-30 08:30", mat:"PROGETTAZIONE WEB", aula:"ING S17", tipo:"Pratica"},
-        {dt:"2026-02-02 08:30", mat:"PROGETTAZIONE WEB", aula:"ING S15", tipo:"Orale"},
-        {dt:"2026-02-18 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
-        {dt:"2026-02-19 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI5", tipo:"Orale"},
-        {dt:"2026-01-07 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
-        {dt:"2026-01-07 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-01-26 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
-        {dt:"2026-01-26 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-02-16 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
-        {dt:"2026-02-16 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
-        {dt:"2026-01-08 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
-        {dt:"2026-01-27 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
-        {dt:"2026-02-17 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
-        {dt:"2026-01-08 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-01-16 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
-        {dt:"2026-01-27 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-02-04 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
-        {dt:"2026-02-17 14:00", mat:"RETI LOGICHE", aula:"ING SI1", tipo:"Scritto"},
-        {dt:"2026-02-25 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
-        {dt:"2026-01-14 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
-        {dt:"2026-01-19 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-02-02 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
-        {dt:"2026-02-05 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-02-23 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F8", tipo:"Scritto"},
-        {dt:"2026-02-26 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
-        {dt:"2026-01-07 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-01-26 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-02-16 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"}
+        {dt:"2026-06-19 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
+        {dt:"2026-07-09 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING C01", tipo:"Scritto"},
+        {dt:"2026-07-29 08:30", mat:"ALGEBRA LINEARE E ANALISI MATEMATICA II", aula:"ING CD1", tipo:"Scritto"},
+        
+        {dt:"2026-06-12 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING SI1", tipo:"Scritto"},
+        {dt:"2026-07-03 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING S11", tipo:"Scritto"},
+        {dt:"2026-07-23 08:30", mat:"ALGORITMI E STRUTTURE DATI", aula:"ING 11", tipo:"Scritto"},
+
+        {dt:"2026-06-09 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-06-15 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
+        {dt:"2026-06-30 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-07-06 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR F5", tipo:"Orale"},
+        {dt:"2026-07-20 08:30", mat:"ANALISI MATEMATICA I", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-07-24 14:00", mat:"ANALISI MATEMATICA I", aula:"ETR FS", tipo:"Orale"},
+
+        {dt:"2026-06-16 08:30", mat:"BASI DI DATI", aula:"ETR F2, ING S17", tipo:"Orale"},
+        {dt:"2026-07-07 08:30", mat:"BASI DI DATI", aula:"ETR F2, ING S17", tipo:"Orale"},
+        {dt:"2026-07-27 08:30", mat:"BASI DI DATI", aula:"ETR F2, ING S17", tipo:"Orale"},
+
+        {dt:"2026-06-10 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1, ING S17", tipo:"Scritto"},
+        {dt:"2026-06-16 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-07-01 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1, ING 517", tipo:"Scritto"},
+        {dt:"2026-07-07 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING 825", tipo:"Orale"},
+        {dt:"2026-07-21 08:30", mat:"CALCOLATORI ELETTRONICI", aula:"ING SI1, ING 517", tipo:"Scritto"},
+        {dt:"2026-07-27 14:00", mat:"CALCOLATORI ELETTRONICI", aula:"ING B25", tipo:"Orale"},
+
+        {dt:"2026-06-09 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-06-11 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+        {dt:"2026-06-30 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-07-02 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+        {dt:"2026-07-20 08:30", mat:"CALCOLO NUMERICO", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-07-22 08:30", mat:"CALCOLO NUMERICO", aula:"ND", tipo:"Orale"},
+
+        {dt:"2026-06-10 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-06-15 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
+        {dt:"2026-07-01 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-07-06 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING 822", tipo:"Orale"},
+        {dt:"2026-07-21 14:00", mat:"COMUNICAZIONI NUMERICHE", aula:"ETR F2", tipo:"Scritto"},
+        {dt:"2026-07-24 08:30", mat:"COMUNICAZIONI NUMERICHE", aula:"ING B22", tipo:"Orale"},
+
+        {dt:"2026-06-11 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-06-11 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+        {dt:"2026-07-02 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-07-02 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+        {dt:"2026-07-22 08:30", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ING B21", tipo:"Pratica"},
+        {dt:"2026-07-22 14:00", mat:"ECONOMIA E ORGANIZZAZIONE AZIENDALE", aula:"ND", tipo:"Orale"},
+
+        {dt:"2026-06-11 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-06-19 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-07-02 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-07-10 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-07-22 08:30", mat:"ELETTRONICA DIGITALE", aula:"ETR F6", tipo:"Scritto"},
+        {dt:"2026-07-30 08:30", mat:"ELETTRONICA DIGITALE", aula:"ING A26", tipo:"Orale"},
+
+        {dt:"2026-06-12 08:30", mat:"ELETTROTECNICA", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-06-16 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-07-03 08:30", mat:"ELETTROTECNICA", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-07-07 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+        {dt:"2026-07-23 08:30", mat:"ELETTROTECNICA", aula:"ING B11", tipo:"Scritto"},
+        {dt:"2026-07-27 08:30", mat:"ELETTROTECNICA", aula:"ING A26", tipo:"Orale"},
+
+        {dt:"2026-06-10 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-06-18 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+        {dt:"2026-07-01 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-07-08 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+        {dt:"2026-07-21 14:00", mat:"FISICA GENERALE I", aula:"ING B31", tipo:"Scritto"},
+        {dt:"2026-07-28 08:30", mat:"FISICA GENERALE I", aula:"ETR F3", tipo:"Orale"},
+
+        {dt:"2026-06-08 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ING A13", tipo:"Orale"},
+        {dt:"2026-06-29 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ING A13", tipo:"Orale"},
+        {dt:"2026-07-17 08:30", mat:"FONDAMENTI DI AUTOMATICA", aula:"ING A13", tipo:"Orale"},
+
+        {dt:"2026-06-08 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1, ING S15, ING SI7", tipo:"Pratica"},
+        {dt:"2026-06-22 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
+        {dt:"2026-06-29 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1, ING SIS, ING S17", tipo:"Pratica"},
+        {dt:"2026-07-10 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING B31", tipo:"Orale"},
+        {dt:"2026-07-17 14:00", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING SI1, ING SIS, ING S17", tipo:"Pratica"},
+        {dt:"2026-07-30 08:30", mat:"FONDAMENTI DI PROGRAMMAZIONE", aula:"ING 831", tipo:"Orale"},
+
+        {dt:"2026-06-08 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+        {dt:"2026-06-29 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+        {dt:"2026-07-17 08:30", mat:"INGEGNERIA DEL SOFTWARE", aula:"ING B32", tipo:"Orale"},
+
+        {dt:"2026-06-12 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-07-03 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-07-23 08:30", mat:"LABORATORIO DI INFORMATICA APPLICATA", aula:"ING A28", tipo:"Orale"},
+
+        {dt:"2026-06-16 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
+        {dt:"2026-07-07 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING 516", tipo:"Scritto"},
+        {dt:"2026-07-27 08:30", mat:"PROGETTAZIONE DI RETI INFORMATICHE", aula:"ING S16", tipo:"Scritto"},
+
+        {dt:"2026-06-10 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-06-11 14:00", mat:"PROGETTAZIONE WEB", aula:"ING S15", tipo:"Orale"},
+        {dt:"2026-07-01 14:00", mat:"PROGETTAZIONE WEB", aula:"ING SI1", tipo:"Pratica"},
+        {dt:"2026-07-02 14:00", mat:"PROGETTAZIONE WEB", aula:"ING 515", tipo:"Orale"},
+        {dt:"2026-07-21 14:00", mat:"PROGETTAZIONE WEB", aula:"ING S1", tipo:"Pratica"},
+        {dt:"2026-07-22 14:00", mat:"PROGETTAZIONE WEB", aula:"ING S15", tipo:"Orale"},
+
+        {dt:"2026-06-08 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-06-08 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-06-29 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-06-29 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+        {dt:"2026-07-17 08:30", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING S17", tipo:"Pratica"},
+        {dt:"2026-07-17 14:00", mat:"PROGRAMMAZIONE AVANZATA", aula:"ING A28", tipo:"Orale"},
+
+        {dt:"2026-06-09 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
+        {dt:"2026-06-30 08:30", mat:"RETI INFORMATICHE", aula:"ING C32", tipo:"Orale"},
+        {dt:"2026-07-20 08:30", mat:"RETI INFORMATICHE", aula:"ING 32", tipo:"Orale"},
+
+        {dt:"2026-06-09 14:00", mat:"RETI LOGICHE", aula:"ING SI1, ING S17", tipo:"Scritto"},
+        {dt:"2026-06-18 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+        {dt:"2026-06-30 14:00", mat:"RETI LOGICHE", aula:"ING SI1, ING S17", tipo:"Scritto"},
+        {dt:"2026-07-08 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+        {dt:"2026-07-20 14:00", mat:"RETI LOGICHE", aula:"ING SIL, ING 517", tipo:"Scritto"},
+        {dt:"2026-07-28 08:30", mat:"RETI LOGICHE", aula:"ING C11", tipo:"Orale"},
+
+        {dt:"2026-06-12 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-06-19 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-07-03 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-07-09 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+        {dt:"2026-07-23 14:00", mat:"RICERCA OPERATIVA", aula:"ETR F9", tipo:"Scritto"},
+        {dt:"2026-07-29 08:30", mat:"RICERCA OPERATIVA", aula:"ETR F2", tipo:"Orale"},
+
+        {dt:"2026-06-08 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
+        {dt:"2026-06-29 08:30", mat:"SISTEMI OPERATIVI", aula:"ING 825", tipo:"Orale"},
+        {dt:"2026-07-17 08:30", mat:"SISTEMI OPERATIVI", aula:"ING 825", tipo:"Orale"}
     ];
 
     let selectedCourses = new Set();
@@ -202,13 +223,13 @@
         const container = document.getElementById('calendarArea');
         container.innerHTML = '';
 
-        // Disegna Gennaio e Febbraio 2026
-        renderMonth(2026, 0, container); // 0 = Gennaio
-        renderMonth(2026, 1, container); // 1 = Febbraio
+        // Disegna Giugno e Luglio 2026
+        renderMonth(2026, 5, container); // 5 = Giugno
+        renderMonth(2026, 6, container); // 6 = Luglio
     }
 
     function renderMonth(year, month, container) {
-        const monthNames = ["Gennaio", "Febbraio"];
+        const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         
         // Calcola giorno settimana inizio mese (Lun=0...Dom=6 per gestire layout italiano)
