@@ -300,7 +300,11 @@
         
         {dt:"2026-06-08 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
         {dt:"2026-06-29 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
-        {dt:"2026-07-17 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"}
+        {dt:"2026-07-17 08:30", mat:"SISTEMI OPERATIVI", aula:"ING B25", tipo:"Orale"},
+
+        {dt:"2026-05-19 14:00", mat:"INTRODUZIONE ALL'INTELLIGENZA ARTIFICIALE", aula:"FIB D5, FIB D3", tipo:"Scritto"},
+        {dt:"2026-06-09 11:00", mat:"INTRODUZIONE ALL'INTELLIGENZA ARTIFICIALE", aula:"FIB D5, FIB D3", tipo:"Scritto"},
+        {dt:"2026-07-14 11:00", mat:"INTRODUZIONE ALL'INTELLIGENZA ARTIFICIALE", aula:"FIB D5, FIB D3", tipo:"Scritto"}
     ];
 
     let selectedCourses = new Set();
@@ -365,7 +369,8 @@
             return;
         }
 
-        // Disegna Giugno (5) e Luglio (6) 2026
+        // Disegna Maggio(4) Giugno (5) e Luglio (6) 2026
+        renderMonth(2026, 4, container);
         renderMonth(2026, 5, container); 
         renderMonth(2026, 6, container); 
     }
